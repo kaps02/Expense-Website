@@ -8,7 +8,8 @@ const userRoute =  require('./routes/userRoute')
 const app = express();
 
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname , 'view')));
+app.use(express.static(path.join(__dirname, "view")));
+
 app.use('/' , userRoute);
 
 
