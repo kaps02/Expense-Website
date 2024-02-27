@@ -40,9 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     email: formData.get('email'),
                     password: formData.get('password')
                 });
-                if (response.status === 201) {
+                if (response.status === 200) {
                     console.log("user register successfully....")
-                    signupForm.reset(); // Reset the form fields
+                    //signupForm.reset(); // Reset the form fields
                 }
             } catch (error) {
                 console.error('Error in signup form :', error);
