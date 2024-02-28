@@ -15,7 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
     
                 if (response.status === 200) {
+                localStorage.setItem('email', email);        //storing .........
+                    
                     console.log('Login successful');
+                    window.location.href = '/expense';
                     // Optionally, redirect the user to another page or perform other actions
                 } else {
                     console.error('Login failed');
@@ -42,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 if (response.status === 200) {
                     console.log("user register successfully....")
+                    window.location.href = '/user/login';
                     //signupForm.reset(); // Reset the form fields
                 }
             } catch (error) {

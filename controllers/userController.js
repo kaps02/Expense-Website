@@ -1,4 +1,3 @@
-const { json } = require('body-parser');
 const UserDB = require('../models/userModel');
 const bcrypt = require('bcrypt');
 
