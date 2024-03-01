@@ -3,7 +3,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/database')
 
 // Define the Expense model
-const UserDB = sequelize.define('UserDB', {
+const User = sequelize.define('User', {
         name: {
           type: DataTypes.STRING,
           allowNull: false
@@ -16,10 +16,12 @@ const UserDB = sequelize.define('UserDB', {
           type: DataTypes.STRING, 
           allowNull: false
         }
-      });
+      }, {
+        freezeTableName: true // Set freezeTableName option to true
+    });
       
 // Sync the model with the database
-sequelize.sync();
+//sequelize.sync();
 
 // Export the Expense model
-module.exports = UserDB;
+module.exports = User;

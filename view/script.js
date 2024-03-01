@@ -9,17 +9,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.querySelector('#password').value;
     
             try {
-                const response = await axios.post('/user/login', {
+                const response = await axios.post('/user/login', {      //axios call.....
                     email,
                     password
                 });
     
                 if (response.status === 200) {
-                localStorage.setItem('email', email);        //storing .........
+                localStorage.setItem('token', response.data.token);        //storing .........
                     
-                    console.log('Login successful');
-                    window.location.href = '/expense';
-                    // Optionally, redirect the user to another page or perform other actions
+                    console.log('Login successful...' ,response.data.token );
+                    window.location.href = '/expense/get';
+                   //await axios.get('/expense/get' ,  { Headers : {'Authorization': response.data.token}});
                 } else {
                     console.error('Login failed');
                     // Optionally, display an error message to the user
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault(); // Prevent the default form submission behavior
             const formData = new FormData(signupForm);
             try {
-                const response = await axios.post('/user/signup', {
+                const response = await axios.post('/user/signup', {     //axios call......
                     name: formData.get('name'),
                     email: formData.get('email'),
                     password: formData.get('password')

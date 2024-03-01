@@ -1,9 +1,9 @@
 // models/ExpenseModel.js
-const { Sequelize, DataTypes } = require('sequelize');
+const {  DataTypes } = require('sequelize');
 const sequelize = require('../config/database')
 
 // Define the Expense model
-const ExpenseDB = sequelize.define('ExpenseDB', {
+const Expense = sequelize.define('Expense', {
         category: {
           type: DataTypes.STRING,
           allowNull: false
@@ -16,10 +16,12 @@ const ExpenseDB = sequelize.define('ExpenseDB', {
           type: DataTypes.STRING, 
           allowNull: false
         }
-      });
+      }, {
+        freezeTableName: true // Set freezeTableName option to true
+    });
       
 // Sync the model with the database
-sequelize.sync();
+//sequelize.sync();
 
 // Export the Expense model
-module.exports = ExpenseDB;
+module.exports = Expense;
