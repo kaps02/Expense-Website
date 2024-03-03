@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('token', response.data.token);        //storing .........
                     
                     console.log('Login successful...' ,response.data.token );
-                    window.location.href = '/expense/get';
+                    //window.location.href = '/expense/get';
                    //await axios.get('/expense/get' ,  { Headers : {'Authorization': response.data.token}});
                 } else {
                     console.error('Login failed');

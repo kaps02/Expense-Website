@@ -65,3 +65,34 @@ exports.postLogin = async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
+
+// Assuming you have already set up your Express app and required necessary dependencies
+
+
+// Controller to handle GET request to fetch user data
+exports.getUserData = async (req, res) => {
+    try {
+        // Assuming you have the user ID available in the request object
+        const userId = req.user.id;
+
+        // Fetch user data from the database based on user ID
+        const user = await User.findByPk(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Send user data in the response
+        res.json({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            isPremiumUser: user.isPremiumUser
+            // Add other fields as needed
+        });
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+

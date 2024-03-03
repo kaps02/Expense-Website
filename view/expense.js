@@ -1,8 +1,75 @@
 // script.js
 
+////////////////// payment frontend.................
+document.getElementById("buy-button").onclick = async function (e) {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    try {
+        const result = await axios.get("/payment/createOrder", {
+            headers: { 'Authorization': token }
+        });
+
+        const options = {
+            key: result.data.key_id,
+            order_id: result.data.order.id,
+            handler: async function (response) {
+                try {
+                    await axios.post("/payment/updateOrder", {
+                        order_id: result.data.order.id,
+                        payment_id: response.razorpay_payment_id,
+                        status: "SUCCESS",
+                    }, {
+                        headers: { "Authorization": token }
+                    });
+                    alert("You are a premium User Now");
+                } catch (error) {
+                    console.error(error);
+                    alert("Failed to update order status");
+                }
+            }
+        };
+
+        const razorpayObject = new Razorpay(options);
+        razorpayObject.open();
+    } catch (error) {
+        console.error(error);
+        alert("Failed to create payment order");
+    }
+};
+
+async function fetchPremium() {
+    try {console.log("we are in fetch...");
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`/payment/userData`, {
+            headers: { 'Authorization': token }
+        });
+
+        const isPremiumUser = response.data.isPremiumUser;
+        const btn = document.getElementById('buy-button');
+
+        if (isPremiumUser) {
+            btn.style.display = 'none';
+            
+        } else {
+            btn.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+}
+
+
+
+
+
+  /////////////////////// expense.js.........................
+
 
 document.addEventListener('DOMContentLoaded', function () {
     fetchExpenses();
+    fetchPremium();
+
     // Add event listener for form submission
     document.getElementById('expenseForm').addEventListener('submit', async function (event) {
         event.preventDefault(); // Prevent the default form submission behavior
@@ -101,3 +168,6 @@ async function deleteExpense(id) {
         }
     }
 }
+
+
+

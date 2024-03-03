@@ -15,13 +15,17 @@ const User = sequelize.define('User', {
         password: {
           type: DataTypes.STRING, 
           allowNull: false
-        }
+        },
+        isPremiumUser: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false // Set default value if needed
+      }
       }, {
         freezeTableName: true // Set freezeTableName option to true
     });
       
-// Sync the model with the database
-//sequelize.sync();
+
 
 // Export the Expense model
 module.exports = User;
