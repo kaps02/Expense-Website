@@ -4,6 +4,7 @@
 document.getElementById("buy-button").onclick = async function (e) {
     e.preventDefault();
     const token = localStorage.getItem("token");
+    console.log("token in payment" , token);
 
     try {
         const result = await axios.get("/payment/createOrder", {
@@ -15,14 +16,18 @@ document.getElementById("buy-button").onclick = async function (e) {
             order_id: result.data.order.id,
             handler: async function (response) {
                 try {
-                    await axios.post("/payment/updateOrder", {
+                    const updateToken = await axios.post("/payment/updateOrder", {          //axios call
                         order_id: result.data.order.id,
                         payment_id: response.razorpay_payment_id,
                         status: "SUCCESS",
                     }, {
                         headers: { "Authorization": token }
                     });
+                    console.log(updateToken);
+                    localStorage.setItem('token', updateToken.data.token);
                     alert("You are a premium User Now");
+                    fetchPremium();
+
                 } catch (error) {
                     console.error(error);
                     alert("Failed to update order status");
@@ -39,26 +44,51 @@ document.getElementById("buy-button").onclick = async function (e) {
 };
 
 async function fetchPremium() {
-    try {console.log("we are in fetch...");
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`/payment/userData`, {
-            headers: { 'Authorization': token }
-        });
-
-        const isPremiumUser = response.data.isPremiumUser;
+    try {
+        console.log("we are in fetch premium...");
         const btn = document.getElementById('buy-button');
+        const premium = document.getElementById('show-premium');
 
-        if (isPremiumUser) {
-            btn.style.display = 'none';
-            
-        } else {
-            btn.style.display = 'block';
-        }
+             btn.style.display = 'none';
+             premium.textContent = 'You are a premium user';
+             showLeaderBoard();
     } catch (error) {
         console.error('Error fetching user data:', error);
     }
 }
 
+function showLeaderBoard() {
+    console.log("into sholeaderboard");
+    const inputElement = document.createElement("input");
+    inputElement.type = "button";
+    inputElement.value = "Show LeaderBoard";
+
+    inputElement.onclick = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await axios.get("/premium/leaderboard", {
+                headers: { 'Authorization': token }
+            });
+            const leaderArray = response.data;
+
+            var leaderElement = document.getElementById('leaderboard');
+            leaderElement.innerHTML = ''; // Clear existing content
+            var header = document.createElement('h1');
+            header.textContent = 'Leader Board';
+            leaderElement.appendChild(header);
+
+            leaderArray.forEach((userDetail) => {
+                var listItem = document.createElement('li');
+                listItem.textContent = `Name - ${userDetail.name}, Total Expense - ${userDetail.amount}`;
+                leaderElement.appendChild(listItem);
+            });
+        } catch (error) {
+            console.error("Error fetching leaderboard data:", error);
+        }
+    };
+
+    document.getElementById('message').appendChild(inputElement);
+}
 
 
 
@@ -68,7 +98,6 @@ async function fetchPremium() {
 
 document.addEventListener('DOMContentLoaded', function () {
     fetchExpenses();
-    fetchPremium();
 
     // Add event listener for form submission
     document.getElementById('expenseForm').addEventListener('submit', async function (event) {
@@ -95,15 +124,32 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+//decode token to frontend
+function parseJwt (token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
 // Function to fetch expenses and populate the table
 async function fetchExpenses() {
     const token = localStorage.getItem('token');
-    console.log("response from token .........", token);
+    const decodeToken = parseJwt(token);
+    console.log("response from token .........", decodeToken);
+    const isPremiumUser = decodeToken.isPremiumUser;
     if (!token) {
         console.log('Login to access this page');
         alert("Login to access this page");
         window.location.href = '/user/login'; // Redirect to login page
         return; // Stop further execution
+    }
+    if(isPremiumUser){
+    fetchPremium(isPremiumUser);
+
     }
 
     try {

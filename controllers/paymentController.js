@@ -3,6 +3,7 @@ require('dotenv').config({ path: 'E:/dec_Batch/expense_website/signup/.env' });
 const Razorpay = require('razorpay');
 const Order = require('../models/orderModel');
 const User = require('../models//userModel');
+const {generateToken} = require('../controllers/userController')
 
 const razorpayInstance = new Razorpay({
     key_id: process.env.KEY_ID,
@@ -18,6 +19,7 @@ var options = {
 exports.createPayment = (req, res) => {
     // Create Razorpay order
     razorpayInstance.orders.create(options, (err, order) => {
+        console.log(options)
         if (err) {
             console.error(err);
             return res.status(500).json({ error: 'Error creating order', message: err.message });
@@ -40,6 +42,7 @@ exports.updatePayment = async (req, res) => {
     try {console.log(req.body)
         const { order_id, payment_id,  status } = req.body;
        // console.log('tbl order id..' , orderId );
+        const userId = req.user.id;
         const order = await Order.findOne({ where: { orderId : order_id } });
         //console.log("order is :", order);
         const promise1 = await Order.update({ paymentId: payment_id, status: status },{ where: { orderId: order_id } });
@@ -47,7 +50,9 @@ exports.updatePayment = async (req, res) => {
 
         Promise.all([promise1, promise2])
             .then(() => {
-                return res.status(202).json({ success: true, message: "Transaction Successful" });
+                
+                return res.status(202).
+                json({ success: true, message: "Transaction Successful" , token : generateToken(userId , true)});
             })
             .catch((error) => { 
                 throw new Error(error);

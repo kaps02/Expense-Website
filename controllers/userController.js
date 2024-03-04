@@ -3,11 +3,12 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 // Function to generate JWT token
-function generateToken(id) {
-    const payload = { userId: id };
+exports.generateToken = (id, isPremiumUser) => {
+    const payload = { userId: id, isPremiumUser };
     const secretKey = 'secretkey';
     return jwt.sign(payload, secretKey); // Signing the token with the payload and secret key
-}
+};
+
 
 // Controller for user signup
 exports.postSignup = async (req, res) => {
@@ -53,7 +54,8 @@ exports.postLogin = async (req, res) => {
         const match = await bcrypt.compare(password, user.password);
         if (match) {
             // Generate token and send it in response
-            const token = generateToken(user.id);
+            const token = exports.generateToken(user.id , user.isPremiumUser);
+
             console.log("Login successful");
             res.status(200).json({ success: true, message: "User logged in successfully", token });
         } else {
@@ -66,7 +68,6 @@ exports.postLogin = async (req, res) => {
     }
 };
 
-// Assuming you have already set up your Express app and required necessary dependencies
 
 
 // Controller to handle GET request to fetch user data
@@ -95,4 +96,3 @@ exports.getUserData = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-
