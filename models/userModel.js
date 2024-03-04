@@ -20,6 +20,11 @@ const User = sequelize.define('User', {
           type: DataTypes.BOOLEAN,
           allowNull: false,
           defaultValue: false // Set default value if needed
+      },
+      totalExpense:{
+        type:DataTypes.INTEGER,
+        defaultValue:0
+
       }
       }, {
         freezeTableName: true // Set freezeTableName option to true

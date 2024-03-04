@@ -1,12 +1,16 @@
 const Expense = require('../models/expenseModel');
+const User = require('../models//userModel');
 const path = require('path');
 
 exports.createExpense = async (req, res) => {
   const { category, description, amount } = req.body;
   try {
-    console.log(req.user.id);
-    await Expense.create({ category, description, amount, UserId: req.user.id});
+    const ExpenseAmount = Number(req.user.totalExpense) + Number(amount)  ;
+    //console.log(req.user.id);
+    await Expense.create({ category, description, amount, UserId: req.user.id  });
     console.log('Expense created with id.....' , { category, description, amount, UserId: req.user.id});
+    await User.update({ totalExpense: ExpenseAmount }, { where: { id: req.user.id } });
+
     res.status(201).json({ success: true, message: "Expense added in table." }); // Created
   } catch (error) {
     console.error('Error creating expense:', error);
