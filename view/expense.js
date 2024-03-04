@@ -80,7 +80,8 @@ function showLeaderBoard() {
 
             leaderArray.forEach((userDetail) => {
                 var listItem = document.createElement('li');
-                listItem.textContent = `Name - ${userDetail.name}, Total Expense - ${userDetail.total_cost}`;
+                
+                listItem.textContent = `Name - ${userDetail.name}, Total Expense - ${userDetail.total_cost || 0}`;
                 leaderElement.appendChild(listItem);
             });
         } catch (error) {
