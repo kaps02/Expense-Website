@@ -1,6 +1,7 @@
 const Expense = require('../models/expenseModel');
 const User = require('../models//userModel');
 const path = require('path');
+const sequelize = require('../config/database');
 
 exports.createExpense = async (req, res) => {
   const { category, description, amount } = req.body;
@@ -54,29 +55,36 @@ exports.deleteExpenses= async(req ,res)=>{
 }*/
 
 exports.deleteExpense = async (req, res) => {
-  const id = req.params.id; //expense id to be deleted
-  const userId = req.user.id; // Assuming you have the user's ID stored in req.user(auth)
+  const id = req.params.id;
+  const userId = req.user.id;
+
+  let transaction;
 
   try {
-      // Find the expense by ID
-      const expense = await Expense.findByPk(id);
+    transaction = await sequelize.transaction();
 
-      // Check if the expense exists
-      if (!expense) {
-          return res.status(404).json({ error: "Expense not found" });
-      }
-//console.log("..........",expense.UserId ,userId );
-      // Check if the user making the request is the creator of the expense
-      if (expense.UserId !== userId) {
-          return res.status(403).json({ error: "You are not authorized to delete this expense" });
-      }
+    const expense = await Expense.findByPk(id, { transaction });
+    if (!expense) {
+      await transaction.rollback();
+      return res.status(404).json({ error: "Expense not found" });
+    }
 
-      // Delete the expense from the database
-      await Expense.destroy({ where: { id } });
-      
-      res.sendStatus(200); // OK
+    if (expense.UserId !== userId) {
+      await transaction.rollback();
+      return res.status(403).json({ error: "You are not authorized to delete this expense" });
+    }
+
+    const ExpenseAmount = Number(req.user.totalExpense) - Number(expense.dataValues.amount);
+
+    await User.update({ totalExpense: ExpenseAmount }, { where: { id: req.user.id }, transaction });
+    await Expense.destroy({ where: { id }, transaction });
+
+    await transaction.commit();
+
+    res.sendStatus(200); // OK
   } catch (error) {
-      console.error('Error deleting expense:', error);
-      res.sendStatus(500); // Internal Server Error
+    console.error('Error deleting expense:', error);
+    if (transaction) await transaction.rollback();
+    res.sendStatus(500); // Internal Server Error
   }
 }

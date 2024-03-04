@@ -210,6 +210,7 @@ async function deleteExpense(id) {
             
              if (response.status === 200) {
                 fetchExpenses(); // Refresh the table after deleting an expense
+                //fetchPremium();
             }
         } catch (error) {
             console.error('Error:', error);
