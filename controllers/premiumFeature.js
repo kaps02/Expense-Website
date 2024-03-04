@@ -1,39 +1,31 @@
 const User = require('../models/userModel');
 const Expense = require('../models/expenseModel');
-
+const sequelize = require('../config/database');
+//const { expense } = require('../models/expenseModel');
 exports.showLeaderBoard = async (req, res) => {
     try {
-        const users = await User.findAll();
-        const expenses = await Expense.findAll();
-
-        const userAggregateExpenses = {};
-
-        // Aggregate expenses for each user
-        expenses.forEach(expense => {
-            console.log(expense);
-            const userId = parseInt(expense.UserId); // Parse userId to integer
-            const amount = parseInt(expense.amount); // Parse amount to integer
-            if (userAggregateExpenses[userId]) {
-                userAggregateExpenses[userId] += amount;
-            } else {
-                userAggregateExpenses[userId] = amount;
-            }
+        const users = await User.findAll({
+            attributes: ['id', 'name']
+        });
+        const userAggregateExpenses = await Expense.findAll({
+            attributes: [
+                'UserId',
+                [sequelize.fn('sum', sequelize.col('amount')), 'total_cost'] // Aggregate the 'amount' column
+            ],
+            group: ['UserId']
         });
         
-        console.log("......",userAggregateExpenses);
+        const storeData = [];
+users.forEach(user => {
+    const userAggregateExpense = userAggregateExpenses.find(expense => expense.UserId === user.id);
+    const total_cost = userAggregateExpense ? userAggregateExpense.dataValues.total_cost : 0;
+    storeData.push({ name: user.name, total_cost: total_cost });
+});
+console.log(storeData);
 
-        // Create user leaderboard array
-        const userLeaderBoard = users.map(user => ({
-            name: user.name,
-            amount: userAggregateExpenses[user.id] || 0
-        }));
+        storeData.sort((a, b) => b.totalCost - a.totalCost); // Sort by totalCost
 
-        // Sort the leaderboard array by amount (descending order)
-        userLeaderBoard.sort((a, b) => b.amount - a.amount);
-
-        console.log("User Leaderboard:", userLeaderBoard);
-
-        res.status(200).json(userLeaderBoard);
+        res.status(200).json(storeData);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Internal Server Error" });

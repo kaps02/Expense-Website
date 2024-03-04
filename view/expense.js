@@ -69,17 +69,18 @@ function showLeaderBoard() {
             const response = await axios.get("/premium/leaderboard", {
                 headers: { 'Authorization': token }
             });
+            //console.log("response" , response.data);
             const leaderArray = response.data;
 
             var leaderElement = document.getElementById('leaderboard');
             leaderElement.innerHTML = ''; // Clear existing content
-            var header = document.createElement('h1');
+            var header = document.createElement('h2');
             header.textContent = 'Leader Board';
             leaderElement.appendChild(header);
 
             leaderArray.forEach((userDetail) => {
                 var listItem = document.createElement('li');
-                listItem.textContent = `Name - ${userDetail.name}, Total Expense - ${userDetail.amount}`;
+                listItem.textContent = `Name - ${userDetail.name}, Total Expense - ${userDetail.total_cost}`;
                 leaderElement.appendChild(listItem);
             });
         } catch (error) {
