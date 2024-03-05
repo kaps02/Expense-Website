@@ -1,5 +1,5 @@
 const Expense = require('../models/expenseModel');
-const User = require('../models//userModel');
+const User = require('../models/userModel');
 const path = require('path');
 const sequelize = require('../config/database');
 

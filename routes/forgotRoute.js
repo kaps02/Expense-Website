@@ -6,7 +6,10 @@ const passwordController = require("../controllers/passwordController");
 
 //Middleware
 //const Auth = require("../middleware/auth");
+router.get('/updatepassword/:resetpasswordid', passwordController.updatepassword)
 
-router.post("/forgotpassword", passwordController.sendOTP);
+router.get('/resetpassword/:id', passwordController.resetpassword)
+
+router.post("/forgotpassword", passwordController.forgotpassword);
 
 module.exports = router;

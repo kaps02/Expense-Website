@@ -58,7 +58,7 @@ async function fetchPremium() {
 }
 
 function showLeaderBoard() {
-    console.log("into sholeaderboard");
+    //console.log("into sholeaderboard");
     const inputElement = document.createElement("input");
     inputElement.type = "button";
     inputElement.value = "Show LeaderBoard";
@@ -218,5 +218,26 @@ async function deleteExpense(id) {
     }
 }
 
+ function download(){
+    const token = localStorage.getItem('token');
+
+     axios.get('http://localhost:5000/user/download', { headers: {"Authorization" : token} })
+    .then((response) => {
+        if(response.status === 201){
+            //the bcakend is essentially sending a download link
+            //  which if we open in browser, the file would download
+            var a = document.createElement("a");
+            a.href = response.data.fileUrl;
+            a.download = 'myexpense.csv';
+            a.click();
+        } else {
+            throw new Error(response.data.message)
+        }
+
+    })
+    .catch((err) => {
+        showError(err)
+    });
+}
 
 

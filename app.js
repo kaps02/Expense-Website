@@ -12,6 +12,7 @@ const passwordRoute = require('./routes/forgotRoute');
 const User = require('./models/userModel');
 const Expense = require('./models/expenseModel');
 const Order = require('./models/orderModel');
+const ForgotPasswordRequests = require('./models/passwordModel');
 
 const app = express();
 
@@ -32,6 +33,10 @@ app.use('/password' , passwordRoute);
 
   User.hasMany(Order); 
   Order.belongsTo(User);
+
+  User.hasMany(ForgotPasswordRequests);
+ForgotPasswordRequests.belongsTo(User);
+
 
 
 // Sync database
