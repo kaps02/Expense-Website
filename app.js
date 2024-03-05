@@ -7,6 +7,7 @@ const userRoute =  require('./routes/userRoute')
 const expenseRoute = require('./routes/expenseRoute');
 const paymentRoute = require('./routes/paymentRoute');
 const premiumRoute = require('./routes/premiumFeature');
+const passwordRoute = require('./routes/forgotRoute');
 
 const User = require('./models/userModel');
 const Expense = require('./models/expenseModel');
@@ -22,6 +23,7 @@ app.use('/user' , userRoute);
 app.use('/expense' , expenseRoute);
 app.use('/payment' , paymentRoute);
 app.use('/premium' , premiumRoute);
+app.use('/password' , passwordRoute);
 
 
 

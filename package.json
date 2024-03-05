@@ -9,10 +9,13 @@
     "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.9.2",
+    "nodemailer": "^6.9.11",
     "nodemon": "^3.1.0",
     "npm": "^10.4.0",
+    "otp-generator": "^4.0.1",
     "path": "^0.12.7",
     "razorpay": "^2.9.2",
-    "sequelize": "^6.37.1"
+    "sequelize": "^6.37.1",
+    "sib-api-v3-sdk": "^8.5.0"
   }
 }
