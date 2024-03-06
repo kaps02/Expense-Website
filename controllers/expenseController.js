@@ -20,17 +20,31 @@ exports.createExpense = async (req, res) => {
 };
 
 
+
 exports.getExpense = async (req, res) => {
-    
-  try {
-    const expenses = await Expense.findAll({where: {UserId : req.user.id}});
-    // Read the HTML file and send it as the response
-    res.send(expenses)
-  } catch (error) {
-    console.error("error in getexpense" , error);
-    res.sendStatus(500); // Internal Server Error
-  }
-  }
+    try {
+        const page = req.query.page || 1; // Default to page 1 if not provided
+        const limit = 3; // Number of expenses per page
+
+        const offset = (page - 1) * limit;
+
+        const expenses = await Expense.findAll({
+            where: { UserId: req.user.id },
+            limit: limit,
+            offset: offset
+        });
+
+        // Assuming you want to count total number of expenses for pagination
+        const totalCount = await Expense.count({ where: { UserId: req.user.id } });
+        const totalPages = Math.ceil(totalCount / limit);
+
+        res.json({ expenses, totalPages });
+    } catch (error) {
+        console.error("Error in getExpense", error);
+        res.sendStatus(500); // Internal Server Error
+    }
+};
+
 
 exports.expense = (req, res) => {
 
