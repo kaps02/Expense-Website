@@ -23,8 +23,10 @@ exports.createExpense = async (req, res) => {
 
 exports.getExpense = async (req, res) => {
     try {
+      const perPage = parseInt(req.query.perPage) || 4; // Default to 10 if perPage is not provided
+
         const page = req.query.page || 1; // Default to page 1 if not provided
-        const limit = 3; // Number of expenses per page
+        const limit = perPage; // Number of expenses per page
 
         const offset = (page - 1) * limit;
 

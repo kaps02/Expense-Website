@@ -1,7 +1,14 @@
 // script.js
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Fetch expenses based on the user's preference stored in local storage
     fetchExpenses();
+
+    // Retrieve the user's preference for expenses per page from local storage
+    const pageSizePreference = localStorage.getItem('pageSize');
+    if (pageSizePreference) {
+        document.getElementById('expensesPerPage').value = pageSizePreference;
+    }
 
     // Add event listener for form submission
     document.getElementById('expenseForm').addEventListener('submit', async function (event) {
@@ -25,6 +32,15 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error:', error);
         }
     });
+
+    // Add event listener to handle changes in the number of expenses per page
+    document.getElementById('expensesPerPage').addEventListener('change', function () {
+        const pageSize = this.value;
+        // Store the user's preference for expenses per page in local storage
+        localStorage.setItem('pageSize', pageSize);
+        // Fetch expenses based on the updated preference
+        fetchExpenses();
+    });
 });
 
 // Function to fetch expenses and populate the table
@@ -44,7 +60,12 @@ async function fetchExpenses(page = 1) {
     }
 
     try {
-        const response = await axios.get(`/expense/get?page=${page}`, { headers: { 'Authorization': token } });
+        const pageSizePref = parseInt(localStorage.getItem('pageSize'));
+       
+        // Retrieve the user's preference for expenses per page from the input field
+            const expensesPerPage = pageSizePref || parseInt(document.getElementById('expensesPerPage').value);
+        
+        const response = await axios.get(`/expense/get?page=${page}&perPage=${expensesPerPage}`, { headers: { 'Authorization': token } });
 
         const expenses = response.data.expenses;
         const totalPages = response.data.totalPages;
@@ -74,12 +95,14 @@ async function fetchExpenses(page = 1) {
         totalExpenseElement.textContent = ` ${totalExpense} `;
 
         // Display pagination
-        displayPagination(totalPages);
+        displayPagination(totalPages, page);
 
     } catch (error) {
         console.error('Error:', error);
     }
 }
+
+
 
 // Function to handle deleting an expense
 async function deleteExpense(id) {
@@ -105,7 +128,8 @@ async function deleteExpense(id) {
 }
 
 // Function to display pagination
-function displayPagination(totalPages) {
+function displayPagination(totalPages, currentPage) {
+    console.log("display pagination...");
     const paginationContainer = document.getElementById('pagination');
     paginationContainer.innerHTML = '';
 
@@ -113,12 +137,21 @@ function displayPagination(totalPages) {
         const pageItem = document.createElement('span');
         pageItem.classList.add('page-item');
         pageItem.textContent = i;
+
+        // Highlight the current page
+        if (i === currentPage) {
+            pageItem.classList.add('current-page');
+        }
+
+        // Add event listener to fetch expenses for the clicked page
         pageItem.addEventListener('click', () => {
             fetchExpenses(i);
         });
+
         paginationContainer.appendChild(pageItem);
     }
 }
+
 
 function download() {
     const token = localStorage.getItem('token');
